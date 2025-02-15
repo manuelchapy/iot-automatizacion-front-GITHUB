@@ -19,6 +19,7 @@ export default function HistoryPage() {
         const fetchedRecords = await Promise.all(
           sensorIds.map(async (id) => {
             const response = await fetch(`https://iot-automatizacion-api-github.onrender.com/api/sensors/${id}`);
+            //const response = await fetch(`http://localhost:4000/api/sensors/${id}`);
             if (!response.ok) throw new Error("Error al obtener datos");
             const result = await response.json();
             return result.records.map((r: any) => ({

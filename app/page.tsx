@@ -7,10 +7,7 @@ export default function Home() {
   const [loadingReset, setLoadingReset] = useState(false);
 
   // URL Base (automática según entorno)
-  const BASE_URL =
-    typeof window !== "undefined"
-      ? window.location.origin.replace(":3000", ":4000")
-      : "https://iot-automatizacion-api-github.onrender.com";
+  const BASE_URL = "https://iot-automatizacion-api-github.onrender.com";
 
   // Iniciar monitoreo y generación de datos
   const handleStartMonitoring = async () => {
@@ -47,7 +44,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-6">
-      <h1 className="text-4xl font-bold mb-8">🏠 Panel Principal</h1>
+      <h1 className="text-4xl font-bold mb-8">🏠 Panel Principal!</h1>
 
       <div className="flex flex-col gap-6">
         {/* Botón de inicio */}

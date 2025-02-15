@@ -1,6 +1,7 @@
 export const fetchSensorData = async () => {
     try {
       const response = await fetch("https://iot-automatizacion-api-github.onrender.com/api/sensors/sensor-data");
+      //const response = await fetch("http://localhost:4000/api/sensors/sensor-data");
       if (!response.ok) {
         throw new Error("Error al obtener datos de los sensores");
       }
