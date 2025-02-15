@@ -1,17 +1,22 @@
 "use client"; // 🔹 Asegurar que solo se renderiza en el cliente
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Dashboard() {
-  const [data, setData] = useState<any[]>([]);
+  interface SensorData {
+    id: string;
+    location: string;
+    lastValue: number | null;
+  }
+
+  const [data, setData] = useState<SensorData[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [logs, setLogs] = useState<{ timestamp: string; values: Record<string, number | null> }[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        setLoading(true);
         const response = await fetch("https://iot-automatizacion-api-github.onrender.com/api/sensors/sensor-data");
         if (!response.ok) throw new Error("Error al obtener datos");
         const result = await response.json();
@@ -23,7 +28,7 @@ export default function Dashboard() {
         if (result.data.length > 0) {
           const newLogEntry = {
             timestamp: new Date().toLocaleTimeString(),
-            values: result.data.reduce((acc: Record<string, number | null>, sensor: any) => {
+            values: result.data.reduce((acc: Record<string, number | null>, sensor: SensorData) => {
               acc[sensor.id] = sensor.lastValue;
               return acc;
             }, {}),
@@ -34,8 +39,6 @@ export default function Dashboard() {
       } catch (error) {
         console.error("❌ Error al obtener datos:", error);
         setError("Error al obtener datos del servidor");
-      } finally {
-        setLoading(false);
       }
     }
 
@@ -98,24 +101,18 @@ export default function Dashboard() {
 
       {/* 🔹 Botones para ver Estadísticas e Historial */}
       <div className="flex flex-col md:flex-row gap-4 mt-6">
-        <a
-          href="/statistics"
-          className="px-6 py-3 bg-green-600 text-white rounded-lg shadow-lg hover:bg-green-800 transition text-lg text-center"
-        >
+        <Link href="/statistics" className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-700 transition">
           📈 Ver Estadísticas
-        </a>
-        <a
-          href="/history"
-          className="px-6 py-3 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-800 transition text-lg text-center"
-        >
-          📜 Ver Historial de Registros
-        </a>
+        </Link>
+        <Link href="/history" className="bg-gray-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-gray-700 transition">
+          📜 Ver Registros
+        </Link>
       </div>
 
       {/* 🔙 Botón para volver al menú principal */}
-      <a href="/" className="mt-6 text-blue-400 hover:underline">
+      <Link href="/" className="mt-6 text-blue-400 hover:underline">
         🔙 Volver al Inicio
-      </a>
+      </Link>
     </div>
   );
 }

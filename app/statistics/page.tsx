@@ -13,6 +13,12 @@ import {
   Legend,
 } from "chart.js";
 
+interface SensorRecord {
+  timestamp: string;
+  sensorId: "sensor_1" | "sensor_2" | "sensor_3"; // 🔹 Sensores definidos explícitamente
+  value: number | null;
+}
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -36,23 +42,23 @@ export default function StatisticsPage() {
 
     async function fetchData() {
       try {
-        const sensorIds = ["sensor_1", "sensor_2", "sensor_3"];
-        const fetchedRecords = await Promise.all(
+        const sensorIds = ["sensor_1", "sensor_2", "sensor_3"] as const;
+        const fetchedRecords: SensorRecord[][] = await Promise.all(
           sensorIds.map(async (id) => {
             const response = await fetch(`https://iot-automatizacion-api-github.onrender.com/api/sensors/${id}`);
-            //const response = await fetch(`http://localhost:4000/api/sensors/${id}`);
             if (!response.ok) throw new Error("Error al obtener datos");
             const result = await response.json();
-            return result.records.map((r: any) => ({
+
+            return result.records.map((r: { timestamp: string; value: number | null }) => ({
               timestamp: r.timestamp,
-              sensorId: id,
+              sensorId: id, 
               value: r.value,
             }));
           })
         );
 
         // Aplanar los datos en una sola estructura
-        const allRecords = fetchedRecords.flat();
+        const allRecords: SensorRecord[] = fetchedRecords.flat();
 
         // Agrupar registros por timestamp
         const groupedRecords: { timestamp: string; values: Record<string, number | null> }[] = [];
@@ -70,6 +76,7 @@ export default function StatisticsPage() {
           row.values[record.sensorId] = record.value;
         });
 
+        
         setLogs(groupedRecords.reverse()); // 🔹 Solución: Revertir registros antes de guardarlos
       } catch (error) {
         console.error("❌ Error al obtener datos:", error);

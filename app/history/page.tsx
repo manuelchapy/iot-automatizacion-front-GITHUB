@@ -15,28 +15,35 @@ export default function HistoryPage() {
       try {
         const sensorIds = ["sensor_1", "sensor_2", "sensor_3"];
 
-        // 📌 Obtener registros de todos los sensores
-        const fetchedRecords = await Promise.all(
-          sensorIds.map(async (id) => {
+        interface SensorRecord {
+          timestamp: string;
+          value: number | null;
+          sensorId: string;
+        }
+
+        interface SensorResponse {
+          sensorId: string;
+          records: Omit<SensorRecord, "sensorId">[];
+        }
+
+        const fetchedRecords: SensorRecord[] = await Promise.all(
+          sensorIds.map(async (id): Promise<SensorRecord[]> => {
             const response = await fetch(`https://iot-automatizacion-api-github.onrender.com/api/sensors/${id}`);
             //const response = await fetch(`http://localhost:4000/api/sensors/${id}`);
             if (!response.ok) throw new Error("Error al obtener datos");
-            const result = await response.json();
-            return result.records.map((r: any) => ({
+
+            const result: SensorResponse = await response.json();
+            return result.records.map((r) => ({
               timestamp: r.timestamp,
-              sensorId: id,
               value: r.value,
+              sensorId: id,
             }));
           })
-        );
+        ).then((results) => results.flat());
 
-        // 📌 Aplanar los datos
-        const allRecords = fetchedRecords.flat();
-
-        // 📌 Agrupar registros por timestamp
         const groupedRecords: { timestamp: string; values: Record<string, number | null> }[] = [];
 
-        allRecords.forEach((record) => {
+        fetchedRecords.forEach((record) => {
           let row = groupedRecords.find((r) => r.timestamp === record.timestamp);
 
           if (!row) {
